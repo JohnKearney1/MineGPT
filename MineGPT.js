@@ -1,5 +1,5 @@
 /*
-* MineGPT v1.0
+* MineGPT v2.0
 * Description: This is a reference for a mineflayer bot with chatGPT connectivity and a few additional features.
 * Author: John Kearney
 */
@@ -87,11 +87,17 @@ function lookAtPlayer(bot) {
     bot.lookAt(pos)
 }
 
+const messages = [];
+
+function addMessage(role, msg) {
+  messages.push({ role: role, content: msg });
+}
+
 async function chatGPT(msg) {
     const endpointUrl = 'https://api.openai.com/v1/chat/completions';
     const apiKey = ''; // replace with your ChatGPT API key
   
-    const mess = [ {"role": "user", "content": msg} ]
+    addMessage('user', msg);
   
     const params = {
       messages: mess,
@@ -118,6 +124,9 @@ async function chatGPT(msg) {
     .then(data => {
       // Save the response data to responseMessage
       let responseMessage = data.choices[0].message.content;
+
+      // Save the response to the message log
+      addMessage('assistant', responseMessage);
       // Return the response message as a string
       return responseMessage.toString();
     })
@@ -186,17 +195,7 @@ function chatCommands(username, msg, bot) {
         }
         else if(msg === '!help') {
             bot.chat(`Prefix: '!' ---> help, echo, tp, follow, come, stop, xp, `)
-        }
-        else if(msg == '!xp') {
-            let i = 0
-            while(i<10) {
-                bot.chat(`/summon minecraft:experience_bottle ~2 ~2 ~`)
-                bot.chat(`/summon minecraft:experience_bottle ~ ~2 ~2`)
-                i + 1;
-            }
-            i = 0;
-            
-        }
+        }            
         else if (username != '<BOT_USERNAME>') {
             // Call the function and log the result
             chatGPT(msg).then(result => {
