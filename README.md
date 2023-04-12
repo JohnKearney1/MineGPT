@@ -1,5 +1,5 @@
 # [MineGPT](https://github.com/JohnKearney1/MineGPT)
-MineGPT is a minecraft bot that responds to chat messages using the ChatGPT API. It's reccomended to put the bot in creative or spectator mode. You cannot play on the account you are running the bot on while it is running. As such, this is best for alt accounts on private servers.
+MineGPT is a minecraft bot that responds to chat messages using the ChatGPT API. It's recommended to put the bot in creative or spectator mode. You cannot play on the account you are running the bot on while it is running. As such, this is best for alt accounts on private servers.
 
 MineGPT uses the account of the user and requires a minecraft (Java Edition) account and a valid OpenAI API key. MineGPT will alert you if your OpenAPI key is invalid or expired.
 
