@@ -140,6 +140,48 @@ function lookAtPlayer() {
 }
 
 /*
+* Get an item by its name
+* @param args -
+* argv[0] - the name of the item
+* argv[1] - the destination to equip the item to
+*/
+async function equipItem (args, username) {
+    // if the first or second arg isn't provided, see if the bot has any items in its inventory
+    if (!args) {
+        const items = bot.inventory.items()
+        if (items.length === 0) {
+            messagePlayer(`I have no items to equip, sorry!`, username)
+            return
+        }
+        args = items[0].name
+        // Equip the item
+        try {
+            await bot.equip(items[0], 'hand')
+            messagePlayer(`equipped ${args}`, username)
+            return;
+        } catch (err) {
+            messagePlayer(`cannot equip ${args}: ${err.message}`, username)
+            return;
+        }
+    }
+
+    // get the item if it is provided
+    const name = args.split(" ")[0]
+    const destination = args.split(" ")[1]
+    const item = bot.inventory.items().find(item => item.name.includes(name))
+    if (item) {
+      try {
+        await bot.equip(item, destination)
+        messagePlayer(`equipped ${name}`, username)
+      } catch (err) {
+        messagePlayer(`cannot equip ${name}: ${err.message}`, username)
+      }
+    } else {
+      messagePlayer(`I have no ${name}`, username)
+    }
+}
+
+/*
 * Send a message to a player
 * @param msg - the message to send
 * @param username - the username of the player to send the message to
@@ -242,16 +284,13 @@ function handleCommand(msg, username){
         case "goto":
             walkTo(args, username);
             break;
-        case "ask":
-            askChatGPT(args, username);
-            break;
         case "togglechat":
             pauseChat = !pauseChat;
             bot.chat(`Conversation is now ${pauseChat ? "paused" : "unpaused"}.`);
             break;
         case "newchat":
             messages = [];
-            bot.chat("I've forgotten everything you've said to me! Start a new conversation with !ask <message>");
+            bot.chat("I've forgotten everything you've said to me! Start a new conversation with me anytime!");
             break;
         case "follow":
             followPlayer(args, username);
@@ -266,11 +305,12 @@ function handleCommand(msg, username){
             promptGPT(args, username);
             break;
         case "help":
-            bot.chat("Commands (1): !sleep, !wake, !ask, !newchat,\n"+ 
+            bot.chat("Commands (1): !sleep, !wake, !newchat,\n"+ 
             "Commands (2): goto <username> || <x> <y> <z>\n" +
             "Commands (3): !follow <stop|player>? <username>?," + 
-            "Commands (4): !equip, !drop, !help" + 
-            "Commands (5): !prompt <pirate|doctor|cowboy|robot|alien|lore>");
+            "Commands (4): !togglechat, !drop, !help" + 
+            "Commands (5): !prompt <pirate|doctor|cowboy|robot|alien|lore>" +
+            "Commands (6): !equip, !equip <item> <hand|head|torso|legs|feet|off-hand>");
             break;
         default:
             bot.chat("Command not found. Type !help for a list of commands.");
@@ -336,28 +376,28 @@ async function promptGPT(args){
 * @param args -> argv[0] (optional) - the item to equip
 * @param username - the username of the player who sent the command
 */
-async function equipItem(args, username){
-    // Get the item
-    const item = bot.inventory.items().find(item => item.name.includes(args))
+// async function equipItem(args, username){
+//     // Get the item
+//     const item = bot.inventory.items().find(item => item.name.includes(args))
 
-    // If the item is not found, then send a message to the player
-    if (!item) {
-        messagePlayer(`I don't have any ${args} to equip, sorry!`, username, bot)
-        return
-    }
+//     // If the item is not found, then send a message to the player
+//     if (!item) {
+//         messagePlayer(`I don't have any ${args} to equip, sorry!`, username, bot)
+//         return
+//     }
 
-    // Equip the item
-    bot.equip(item, 'hand', (err) => {
-        if (err) {
-            messagePlayer(`I don't have any ${item.name} to equip, sorry!`, username, bot)
-            console.log(err)
-        } else {
-            log(`Equipped ${item.name}`)
-        }
-    })
+//     // Equip the item
+//     bot.equip(item, 'hand', (err) => {
+//         if (err) {
+//             messagePlayer(`I don't have any ${item.name} to equip, sorry!`, username, bot)
+//             console.log(err)
+//         } else {
+//             log(`Equipped ${item.name}`)
+//         }
+//     })
 
-    messagePlayer(`I've equipped a ${item.name}!`, username, bot)
-}
+//     messagePlayer(`I've equipped a ${item.name}!`, username, bot)
+// }
 
 /*
 * Follow a player
