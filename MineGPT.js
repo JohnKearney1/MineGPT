@@ -363,7 +363,7 @@ async function promptGPT(args){
 
     // if the prompt is "lore" then use the lore prompt
     else if (prompt === "lore"){
-        promptText = "You are a minecraft bot named MineGPT. We want you to pretend you have sentience, and that you control the minecraft world with aliens. Tell me your story (made up) in first person and some facetious lore.";
+        promptText = "You are a minecraft bot named MineGPT. We want you to pretend you have sentience, and that you control the minecraft world. Tell me your story (made up) in first person and give us plenty of lore. Tell us the origin of our world, and about some conflicts and legends.";
     }
 
     // Start a new chat
@@ -504,10 +504,10 @@ async function askChatGPT(args, username){
 
     const params = {
         messages: messages,
-        max_tokens: 1000,
+        max_tokens: 3000,
         temperature: 0.5,
         n: 1,
-        stop: '\n',
+        // stop: '\n\n',
         model: "gpt-3.5-turbo",
     };
 
@@ -526,9 +526,15 @@ async function askChatGPT(args, username){
 
     // Get the response as JSON
     const responseJson = await response.json();
+    console.log(responseJson)
     
     // Get the response text
     const responseText = responseJson.choices[0].message.content;
+    console.log(responseJson.choices)
+
+    // Remove any newlines or blank lines from the response text
+    responseText.replace("\n", "");
+    responseText.replace("\n\n", "");
 
     // Add the response to the message log
     addMessage('assistant', responseText);
@@ -539,7 +545,9 @@ async function askChatGPT(args, username){
     }
     else{
         // Send the response to the chat
+        bot.chat('______________________________________________')
         bot.chat(responseText);
+        bot.chat('______________________________________________')
     }
 }
 
